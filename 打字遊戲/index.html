@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    /* 計分板設計、答錯震動 */
+
+    .blue {
+      background: rgb(20, 190, 241);
+    }
+
+    .red {
+      background: rgb(255, 85, 85);
+    }
+
+    #zom {
+      width: 1900px;
+      height: 800px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #zom img {
+      height: 100px;
+      position: absolute;
+    }
+  </style>
+
+</head>
+
+<body>
+  <input type="button" value="start" id="btn-start">
+  <br>
+  <p>point: <span id="text-score">0</span></p>
+  <p>time: <span id="text-time">0</span> 秒</p>
+
+  <div id="zom">
+    <div id="one">
+      <h1 id="h1"></h1>
+    </div>
+  </div>
+  <script src="./jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+  <script>
+    let score = 0
+    let countdown = 30
+    let timer = 0
+    let arr = []
+    let code;
+    let num = 1
+    $(document).keydown(function (event) {
+      let e = event.key.toUpperCase()
+      for (let i = 0; i <= 4; i++) {
+        if (e == $('.card').eq(0).text()) {
+          $('.card').eq(0).addClass('blue')
+          $("h1").text($('.card').eq(0).text())
+        } else if ((e == $('.card').eq(i).text()) && $('.card').eq(i).prev().hasClass('blue')) {
+          $('.card').eq(i).addClass('blue')
+          $("h1").text($('.card').eq(i).text())
+          num++
+          console.log(num)
+        }
+      }
+
+      if (num == arr.length) {
+        $('#one').next('img').remove()
+        score++
+        // 顯示分數
+        $('#text-score').text(score)
+        $('.card').remove()
+        move()
+        if ($('#zom img').length <= 0) {
+          clearInterval(timer)
+          Swal.fire({
+            icon: 'success',
+            title: '恭喜你清除掉所有殭屍！！',
+            text: `你得到 ${score} 分`
+          })
+          $('#zom img').remove()
+          $(this).attr('disabled', false)
+        }
+      }
+    });
+
+    const move = () => {
+      // 初始化
+      num = 1
+      arr = []
+      for (let i = 0; i <= 4; i++) {
+        code = 65 + (Math.floor(Math.random() * 26))
+        let string = String.fromCharCode(code)
+        if (arr.indexOf(string) === -1) {
+          arr.push(string)
+        } else {
+          i--
+        }
+      }
+      for (let i = 0; i <= 4; i++) {
+        $('#one').append(`<span class="card">${arr[i]}</span>`)
+      }
+    }
+
+    const dance = (zb) => {
+      zb.stop().animate({
+        left: Math.round(Math.random() * 90) + '%',
+        top: Math.round(Math.random() * 90) + '%'
+      }, 5000, function () {
+        dance(zb)
+      })
+    }
+
+
+
+    $('#btn-start').click(function () {
+      $(this).attr('disabled', true)
+      score = 0
+      $('#text-score').text(score)
+      countdown = 30
+      $('#text-time').text(countdown)
+
+      timer = setInterval(() => {
+        countdown--
+        $('#text-time').text(countdown)
+        if (countdown <= 0) {
+          clearInterval(timer)
+          Swal.fire({
+            icon: 'info',
+            title: '時間到',
+            text: `你得到 ${score} 分`
+          })
+          $('#zom img').remove()
+          $(this).attr('disabled', false)
+        }
+      }, 1000);
+
+      for (let i = 1; i <= 5; i++) {
+        const zb = $(`<img src="./zombie.gif" title="打不到勒" style="left:${Math.round(Math.random() * 90)}%;top:${Math.round(Math.random() * 90)}%">`)
+        $('#zom').append(zb)
+        dance(zb)
+      }
+
+      move()
+    })
+
+
+
+  </script>
+</body>
+
+</html>
