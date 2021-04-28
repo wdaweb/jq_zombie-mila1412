@@ -5,27 +5,72 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Jolly+Lodger&display=swap" rel="stylesheet">
   <title>Document</title>
   <style>
-    /* 計分板設計、答錯震動 */
+    /* 答錯震動或多一隻殭屍 */
+    body {
+      /* 預設margin 8px，沒有設0會出現捲軸 */
+      margin: 0;
+      font-family: 'Jolly Lodger', cursive;
+      background-image: url(./images/halloween2.jpg);
+      background-repeat: no-repeat;
+      background-position: left top;
+      background-size: cover;
+      background-attachment: fixed;
+      /* 或是html,body設 height: 100%; */
+      height: 100vh;
+    }
+
+
+    input {
+      position: absolute;
+      left: 2%;
+      top: 11%;
+      width: 36px;
+      height: 36px;
+      border: 0;
+      background-color: rgb(255, 153, 20);
+      color: #fff;
+      border-radius: 50%;
+    }
+
+    #text-time {
+      position: absolute;
+      left: 26%;
+      top: 82%;
+      color: #fff;
+      font-size: 60px;
+    }
+
+    #one {
+      position: absolute;
+      top: 8%;
+      left: 51%;
+      font-size: 50px;
+      color: #fff;
+      text-align: center;
+    }
 
     .blue {
-      background: rgb(20, 190, 241);
+      background: #333;
     }
 
-    .red {
+    /* .red {
       background: rgb(255, 85, 85);
-    }
+    } */
 
     #zom {
-      width: 1900px;
-      height: 800px;
+      /* 原本寫死寬度跟高度會出現捲軸 */
+      width: 100vw;
+      height: 100vh;
       position: relative;
       overflow: hidden;
     }
 
     #zom img {
-      height: 100px;
+      height: 200px;
       position: absolute;
     }
   </style>
@@ -33,12 +78,10 @@
 </head>
 
 <body>
-  <input type="button" value="start" id="btn-start">
-  <br>
-  <p>point: <span id="text-score">0</span></p>
-  <p>time: <span id="text-time">0</span> 秒</p>
+  <span id="text-time">0</span>
 
   <div id="zom">
+    <input type="button" value="start" id="btn-start">
     <div id="one">
       <h1 id="h1"></h1>
     </div>
@@ -77,11 +120,15 @@
           clearInterval(timer)
           Swal.fire({
             icon: 'success',
-            title: '恭喜你清除掉所有殭屍！！',
-            text: `你得到 ${score} 分`
+            title: `Congratulations , you won!`,
+            text: `Your score: ${score}`
           })
+
+          $('#h1').html('')
+          $('.card').remove()
           $('#zom img').remove()
-          $(this).attr('disabled', false)
+          // 不是 $(this).attr('disabled', false)
+          $('#btn-start').attr('disabled', false)
         }
       }
     });
@@ -107,7 +154,7 @@
     const dance = (zb) => {
       zb.stop().animate({
         left: Math.round(Math.random() * 90) + '%',
-        top: Math.round(Math.random() * 90) + '%'
+        top: Math.round(Math.random() * 70) + '%'
       }, 5000, function () {
         dance(zb)
       })
@@ -129,16 +176,19 @@
           clearInterval(timer)
           Swal.fire({
             icon: 'info',
-            title: '時間到',
-            text: `你得到 ${score} 分`
+            title: `Time's up!`,
+            text: `Your score: ${score}`
           })
+          $('#h1').html('')
+          // 按開始鍵跟輸入整排正確的字時都要清空字串
+          $('.card').remove()
           $('#zom img').remove()
           $(this).attr('disabled', false)
         }
       }, 1000);
 
       for (let i = 1; i <= 5; i++) {
-        const zb = $(`<img src="./zombie.gif" title="打不到勒" style="left:${Math.round(Math.random() * 90)}%;top:${Math.round(Math.random() * 90)}%">`)
+        const zb = $(`<img src="./images/zombie.gif" title="打不到勒" style="left:${Math.round(Math.random() * 90)}%;top:${Math.round(Math.random() * 70)}%">`)
         $('#zom').append(zb)
         dance(zb)
       }
